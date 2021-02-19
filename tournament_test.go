@@ -1,9 +1,39 @@
 package tournament
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 )
+
+type GamesArray struct {
+	games []Game
+}
+
+func (ga *GamesArray) Save(game *Game) error {
+	if ga.games == nil {
+		ga.games = []Game{}
+	}
+	ga.games = append(ga.games, *game)
+	return nil
+}
+
+func (ga *GamesArray) FindByTeam(team string) ([]Game, error) {
+	teamGames := []Game{}
+	for _, game := range ga.games {
+		if team == game.TeamA || team == game.TeamB {
+			teamGames = append(teamGames, game)
+		}
+	}
+	if len(teamGames) == 0 {
+		return nil, fmt.Errorf("Team not found: %v", team)
+	}
+	return teamGames, nil
+}
+
+func (ga *GamesArray) FindAll() ([]Game, error) {
+	return ga.games, nil
+}
 
 var gameTestData = []struct {
 	testName string
@@ -46,7 +76,7 @@ var gameTestData = []struct {
 }
 
 func TestGetStatsError(t *testing.T) {
-	tournament := NewTournament()
+	tournament := NewTournament(&GamesArray{})
 	_, err := tournament.GetStats("unknown")
 	if err == nil {
 		t.Errorf("Expected error when getting stats for team that has not played yet")
@@ -55,7 +85,7 @@ func TestGetStatsError(t *testing.T) {
 
 func TestGames(t *testing.T) {
 	for _, testData := range gameTestData {
-		tournament := NewTournament()
+		tournament := NewTournament(&GamesArray{})
 		for _, game := range testData.games {
 			tournament.Play(game)
 		}
@@ -69,13 +99,13 @@ func TestGames(t *testing.T) {
 }
 
 func TestGetAllStats(t *testing.T) {
-	tournament := NewTournament()
+	tournament := NewTournament(&GamesArray{})
 
 	tournament.Play(Game{"a", 1, "b", 0})
 	tournament.Play(Game{"a", 3, "c", 3})
 	tournament.Play(Game{"b", 0, "c", 1})
 
-	allStats := tournament.GetAllStats()
+	allStats, _ := tournament.GetAllStats()
 	expectedStats := []Stats{
 		Stats{Team: "a", Played: 2, Won: 1, Drawn: 1, Points: 4},
 		Stats{Team: "c", Played: 2, Won: 1, Drawn: 1, Points: 4},

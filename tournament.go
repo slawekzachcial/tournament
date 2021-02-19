@@ -1,12 +1,11 @@
 package tournament
 
 import (
-	"fmt"
 	"sort"
 )
 
 type Tournament struct {
-	teamStats map[string]*Stats
+	games Games
 }
 
 type Game struct {
@@ -25,57 +24,104 @@ type Stats struct {
 	Points int
 }
 
-func NewTournament() *Tournament {
+type Games interface {
+	Save(game *Game) error
+	FindByTeam(team string) ([]Game, error)
+	FindAll() ([]Game, error)
+}
+
+func NewTournament(games Games) *Tournament {
 	return &Tournament{
-		teamStats: make(map[string]*Stats),
+		games: games,
 	}
 }
 
 func (t *Tournament) GetStats(team string) (Stats, error) {
-	if stats, ok := t.teamStats[team]; ok {
-		return *stats, nil
-	} else {
-		return Stats{}, fmt.Errorf("Team not found or it has not played yet: %v", team)
+	teamGames, err := t.games.FindByTeam(team)
+	if err != nil {
+		return Stats{}, err
 	}
+
+	stats := []*Stats{}
+	for _, game := range teamGames {
+		stats = updateStats(stats, &game)
+	}
+
+	for _, s := range stats {
+		if s.Team == team {
+			return *s, nil
+		}
+	}
+
+	return Stats{}, nil
 }
 
-func (t *Tournament) GetAllStats() []Stats {
-	allStats := make([]Stats, 0, len(t.teamStats))
+// TODO: should also return an error
+func (t *Tournament) GetAllStats() ([]Stats, error) {
+	allGames, err := t.games.FindAll()
+	if err != nil {
+		return nil, err
+	}
 
-	for _, stats := range t.teamStats {
-		allStats = append(allStats, *stats)
+	allStats := []*Stats{}
+	for _, game := range allGames {
+		allStats = updateStats(allStats, &game)
 	}
 
 	sort.Slice(allStats, func(i, j int) bool {
 		return allStats[i].Points > allStats[j].Points || allStats[i].Points == allStats[i].Points && allStats[i].Team < allStats[i].Team
 	})
 
-	return allStats
+	result := make([]Stats, 0, len(allStats))
+	for _, stats := range allStats {
+		result = append(result, *stats)
+	}
+
+	return result, nil
 }
 
-func (t *Tournament) Play(game Game) {
-	if _, ok := t.teamStats[game.TeamA]; !ok {
-		t.teamStats[game.TeamA] = &Stats{Team: game.TeamA}
-	}
-	if _, ok := t.teamStats[game.TeamB]; !ok {
-		t.teamStats[game.TeamB] = &Stats{Team: game.TeamB}
+func (t *Tournament) Play(game Game) error {
+	return t.games.Save(&game)
+}
+
+func updateStats(stats []*Stats, game *Game) []*Stats {
+	var teamAStats, teamBStats *Stats
+
+	for _, s := range stats {
+		switch s.Team {
+		case game.TeamA:
+			teamAStats = s
+		case game.TeamB:
+			teamBStats = s
+		}
 	}
 
-	t.teamStats[game.TeamA].Played++
-	t.teamStats[game.TeamB].Played++
+	if teamAStats == nil {
+		teamAStats = &Stats{Team: game.TeamA}
+		stats = append(stats, teamAStats)
+	}
+	if teamBStats == nil {
+		teamBStats = &Stats{Team: game.TeamB}
+		stats = append(stats, teamBStats)
+	}
+
+	teamAStats.Played++
+	teamBStats.Played++
 
 	if game.ScoreA > game.ScoreB {
-		t.teamStats[game.TeamA].Won++
-		t.teamStats[game.TeamB].Lost++
-		t.teamStats[game.TeamA].Points += 3
+		teamAStats.Won++
+		teamBStats.Lost++
+		teamAStats.Points += 3
 	} else if game.ScoreA < game.ScoreB {
-		t.teamStats[game.TeamA].Lost++
-		t.teamStats[game.TeamB].Won++
-		t.teamStats[game.TeamB].Points += 3
+		teamAStats.Lost++
+		teamBStats.Won++
+		teamBStats.Points += 3
 	} else {
-		t.teamStats[game.TeamA].Points++
-		t.teamStats[game.TeamB].Points++
-		t.teamStats[game.TeamA].Drawn++
-		t.teamStats[game.TeamB].Drawn++
+		teamAStats.Points++
+		teamBStats.Points++
+		teamAStats.Drawn++
+		teamBStats.Drawn++
 	}
+
+	return stats
 }
