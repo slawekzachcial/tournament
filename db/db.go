@@ -12,6 +12,10 @@ type GamesData struct {
 	pool *pgxpool.Pool
 }
 
+func NewGameData(p *pgxpool.Pool) *GamesData {
+	return &GamesData{p}
+}
+
 func (g *GamesData) Save(game *tournament.Game) error {
 	_, err := g.pool.Exec(context.Background(), "INSERT INTO games(team_a, score_a, team_b, score_b) VALUES ($1, $2, $3, $4)",
 		game.TeamA, game.ScoreA, game.TeamB, game.ScoreB)

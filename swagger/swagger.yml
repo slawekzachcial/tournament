@@ -1,0 +1,109 @@
+swagger: '2.0'
+info:
+  version: 1.0.0
+  title: Tournament
+consumes:
+  - application/slawekzachcial.tournament.v1+json
+produces:
+  - application/slawekzachcial.tournament.v1+json
+schemes:
+  - http
+paths:
+  /games:
+    post:
+      operationId: play
+      parameters:
+        - name: body
+          in: body
+          schema:
+            $ref: '#/definitions/game'
+      responses:
+        201:
+          description: Created
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/error'
+  /stats:
+    get:
+      operationId: getAllStats
+      responses:
+        200:
+          description: List all teams statistics
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/stats'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/error'
+  /stats/{team}:
+    get:
+      operationId: getTeamStats
+      parameters:
+        - name: team
+          type: string
+          in: path
+          required: true
+      responses:
+        200:
+          description: Get team stats
+          schema:
+            $ref: '#/definitions/stats'
+        default:
+          description: Error
+          schema:
+            $ref: '#/definitions/error'
+definitions:
+  game:
+    type: object
+    required:
+      - teamA
+      - scoreA
+      - teamB
+      - scoreB
+    properties:
+      teamA:
+        type: string
+        minLength: 1
+      scoreA:
+        type: integer
+      teamB:
+        type: string
+        minLength: 1
+      scoreB:
+        type: integer
+  stats:
+    type: object
+    required:
+      - team
+      - played
+      - won
+      - drawn
+      - lost
+      - points
+    properties:
+      team:
+        type: string
+        minLength: 1
+      played:
+        type: integer
+      won:
+        type: integer
+      drawn:
+        type: integer
+      lost:
+        type: integer
+      points:
+        type: integer
+  error:
+    type: object
+    required:
+      - message
+    properties:
+      code:
+        type: integer
+        format: int64
+      message:
+        type: string
