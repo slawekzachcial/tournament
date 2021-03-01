@@ -1,7 +1,6 @@
 package tournament
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 )
@@ -26,7 +25,7 @@ func (ga *GamesArray) FindByTeam(team string) ([]Game, error) {
 		}
 	}
 	if len(teamGames) == 0 {
-		return nil, fmt.Errorf("Team not found: %v", team)
+		return nil, ErrTeamNotFound
 	}
 	return teamGames, nil
 }
@@ -78,7 +77,7 @@ var gameTestData = []struct {
 func TestGetStatsError(t *testing.T) {
 	tournament := NewTournament(&GamesArray{})
 	_, err := tournament.GetStats("unknown")
-	if err == nil {
+	if err != ErrTeamNotFound {
 		t.Errorf("Expected error when getting stats for team that has not played yet")
 	}
 }

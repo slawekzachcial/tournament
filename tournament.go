@@ -1,6 +1,7 @@
 package tournament
 
 import (
+	"errors"
 	"sort"
 )
 
@@ -23,6 +24,8 @@ type Stats struct {
 	Lost   int
 	Points int
 }
+
+var ErrTeamNotFound = errors.New("Team not found")
 
 type Games interface {
 	Save(game *Game) error
@@ -56,7 +59,6 @@ func (t *Tournament) GetStats(team string) (Stats, error) {
 	return Stats{}, nil
 }
 
-// TODO: should also return an error
 func (t *Tournament) GetAllStats() ([]Stats, error) {
 	allGames, err := t.games.FindAll()
 	if err != nil {

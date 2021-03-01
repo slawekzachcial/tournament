@@ -100,12 +100,13 @@ func getTeamStatsHandler(theTournament *tournament.Tournament) operations.GetTea
 	return func(params operations.GetTeamStatsParams) middleware.Responder {
 		s, err := theTournament.GetStats(params.Team)
 		if err != nil {
-			msg := err.Error()
-			return operations.NewGetTeamStatsDefault(500).WithPayload(&models.Error{500, &msg})
-		}
-		if s.Team == "" {
-			msg := fmt.Sprintf("Team '%s' not found", params.Team)
-			return operations.NewGetTeamStatsDefault(404).WithPayload(&models.Error{404, &msg})
+			if err == tournament.ErrTeamNotFound {
+				msg := fmt.Sprintf("Team '%s' not found", params.Team)
+				return operations.NewGetTeamStatsDefault(404).WithPayload(&models.Error{404, &msg})
+			} else {
+				msg := err.Error()
+				return operations.NewGetTeamStatsDefault(500).WithPayload(&models.Error{500, &msg})
+			}
 		}
 		played, won, drawn, lost, points := int64(s.Played), int64(s.Won), int64(s.Drawn), int64(s.Lost), int64(s.Points)
 		ms := models.Stats{

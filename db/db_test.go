@@ -9,13 +9,14 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/slawekzachcial/tournament"
 	trn "github.com/slawekzachcial/tournament"
 )
 
 const DB_NAME = "tournament_test"
 
 // TEST_DATABASE_URL="postgres://postgres:secret@localhost:5432"
-var dbServerUrl = os.Getenv("TEST_DATABASE_URL")
+var dbServerUrl = getEnv("TEST_DATABASE_URL", "postgres://postgres:secret@localhost:5432")
 var testDbUrl = fmt.Sprintf("%s/%s", dbServerUrl, DB_NAME)
 
 var dbPool *pgxpool.Pool
@@ -38,6 +39,15 @@ func TestFindByTeam(t *testing.T) {
 
 	if !reflect.DeepEqual(asMap(aGamesExpected), asMap(aGamesGot)) {
 		t.Errorf("Expected A games %v but got %v", aGamesExpected, aGamesGot)
+	}
+}
+
+func TestFindByTeamNotFound(t *testing.T) {
+	gd := GamesData{dbPool}
+
+	_, err := gd.FindByTeam("YOU_SHOULD_NOT_FIND_ME")
+	if err != tournament.ErrTeamNotFound {
+		t.Fatalf("Expecting ErrTeamNotFound error but got %v", err)
 	}
 }
 
@@ -133,4 +143,11 @@ func deleteAllGames() {
 	if err != nil {
 		panic(fmt.Sprintf("Unable to delete all games: %v", err))
 	}
+}
+
+func getEnv(name, defaultValue string) string {
+	if value := os.Getenv(name); value != "" {
+		return value
+	}
+	return defaultValue
 }

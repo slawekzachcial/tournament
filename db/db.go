@@ -34,7 +34,11 @@ func (g *GamesData) FindByTeam(team string) ([]tournament.Game, error) {
 	}
 	defer rows.Close()
 
-	return rowsToGames(rows)
+	games, err := rowsToGames(rows)
+	if len(games) == 0 {
+		return nil, tournament.ErrTeamNotFound
+	}
+	return games, err
 }
 
 func (g *GamesData) FindAll() ([]tournament.Game, error) {
