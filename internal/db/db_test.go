@@ -9,8 +9,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/slawekzachcial/tournament"
-	trn "github.com/slawekzachcial/tournament"
+	tournament "github.com/slawekzachcial/tournament/internal"
 )
 
 const DB_NAME = "tournament_test"
@@ -24,14 +23,14 @@ var dbPool *pgxpool.Pool
 func TestFindByTeam(t *testing.T) {
 	defer deleteAllGames()
 
-	g1, g2, g3 := trn.Game{"A", 1, "B", 0}, trn.Game{"B", 2, "C", 2}, trn.Game{"C", 3, "A", 4}
+	g1, g2, g3 := tournament.Game{"A", 1, "B", 0}, tournament.Game{"B", 2, "C", 2}, tournament.Game{"C", 3, "A", 4}
 
 	gd := GamesData{dbPool}
 	gd.Save(&g1)
 	gd.Save(&g2)
 	gd.Save(&g3)
 
-	aGamesExpected := []trn.Game{g1, g3}
+	aGamesExpected := []tournament.Game{g1, g3}
 	aGamesGot, err := gd.FindByTeam("A")
 	if err != nil {
 		t.Fatalf("Error getting team A games: %v", err)
@@ -54,14 +53,14 @@ func TestFindByTeamNotFound(t *testing.T) {
 func TestFindAll(t *testing.T) {
 	defer deleteAllGames()
 
-	g1, g2, g3 := trn.Game{"A", 1, "B", 0}, trn.Game{"B", 2, "C", 2}, trn.Game{"C", 3, "A", 4}
+	g1, g2, g3 := tournament.Game{"A", 1, "B", 0}, tournament.Game{"B", 2, "C", 2}, tournament.Game{"C", 3, "A", 4}
 
 	gd := GamesData{dbPool}
 	gd.Save(&g1)
 	gd.Save(&g2)
 	gd.Save(&g3)
 
-	expected := []trn.Game{g1, g2, g3}
+	expected := []tournament.Game{g1, g2, g3}
 	got, err := gd.FindAll()
 	if err != nil {
 		t.Fatalf("Error getting all games: %v", err)
@@ -91,8 +90,8 @@ func TestMain(m *testing.M) {
 	testExitCode = m.Run()
 }
 
-func asMap(games []trn.Game) map[trn.Game]bool {
-	m := make(map[trn.Game]bool)
+func asMap(games []tournament.Game) map[tournament.Game]bool {
+	m := make(map[tournament.Game]bool)
 	for _, g := range games {
 		m[g] = true
 	}

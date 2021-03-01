@@ -13,5 +13,6 @@ require (
 	github.com/jackc/pgx v3.6.2+incompatible
 	github.com/jackc/pgx/v4 v4.10.1
 	github.com/jessevdk/go-flags v1.4.0
-	golang.org/x/net v0.0.0-20210119194325-5f4716e94777
+	github.com/mailru/easyjson v0.7.7 // indirect
+	golang.org/x/net v0.0.0-20210226172049-e18ecbb05110
 )

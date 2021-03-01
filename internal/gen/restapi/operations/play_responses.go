@@ -10,7 +10,7 @@ import (
 
 	"github.com/go-openapi/runtime"
 
-	"github.com/slawekzachcial/tournament/gen/models"
+	"github.com/slawekzachcial/tournament/internal/gen/models"
 )
 
 // PlayCreatedCode is the HTTP code returned for type PlayCreated

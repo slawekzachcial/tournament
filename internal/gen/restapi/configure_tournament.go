@@ -10,10 +10,10 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
-	"github.com/slawekzachcial/tournament/gen/restapi/operations"
+	"github.com/slawekzachcial/tournament/internal/gen/restapi/operations"
 )
 
-//go:generate swagger generate server --target ../../gen --name Tournament --spec ../../swagger/swagger.yml --principal interface{} --exclude-main
+//go:generate swagger generate server --target ../../gen --name Tournament --spec ../../../swagger/swagger.yml --principal interface{} --exclude-main
 
 func configureFlags(api *operations.TournamentAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
@@ -37,6 +37,16 @@ func configureAPI(api *operations.TournamentAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
+	if api.GetAllStatsHandler == nil {
+		api.GetAllStatsHandler = operations.GetAllStatsHandlerFunc(func(params operations.GetAllStatsParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.GetAllStats has not yet been implemented")
+		})
+	}
+	if api.GetTeamStatsHandler == nil {
+		api.GetTeamStatsHandler = operations.GetTeamStatsHandlerFunc(func(params operations.GetTeamStatsParams) middleware.Responder {
+			return middleware.NotImplemented("operation operations.GetTeamStats has not yet been implemented")
+		})
+	}
 	if api.PlayHandler == nil {
 		api.PlayHandler = operations.PlayHandlerFunc(func(params operations.PlayParams) middleware.Responder {
 			return middleware.NotImplemented("operation operations.Play has not yet been implemented")

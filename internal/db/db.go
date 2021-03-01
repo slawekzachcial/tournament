@@ -5,7 +5,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/slawekzachcial/tournament"
+	tournament "github.com/slawekzachcial/tournament/internal"
 )
 
 type GamesData struct {
