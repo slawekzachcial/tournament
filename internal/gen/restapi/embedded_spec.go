@@ -35,6 +35,11 @@ func init() {
   "paths": {
     "/games": {
       "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "operationId": "play",
         "parameters": [
           {
@@ -149,6 +154,9 @@ func init() {
         }
       }
     },
+    "principal": {
+      "type": "string"
+    },
     "stats": {
       "type": "object",
       "required": [
@@ -180,6 +188,13 @@ func init() {
           "type": "integer"
         }
       }
+    }
+  },
+  "securityDefinitions": {
+    "key": {
+      "type": "apiKey",
+      "name": "x-token",
+      "in": "header"
     }
   }
 }`))
@@ -201,6 +216,11 @@ func init() {
   "paths": {
     "/games": {
       "post": {
+        "security": [
+          {
+            "key": []
+          }
+        ],
         "operationId": "play",
         "parameters": [
           {
@@ -315,6 +335,9 @@ func init() {
         }
       }
     },
+    "principal": {
+      "type": "string"
+    },
     "stats": {
       "type": "object",
       "required": [
@@ -346,6 +369,13 @@ func init() {
           "type": "integer"
         }
       }
+    }
+  },
+  "securityDefinitions": {
+    "key": {
+      "type": "apiKey",
+      "name": "x-token",
+      "in": "header"
     }
   }
 }`))

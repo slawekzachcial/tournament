@@ -10,10 +10,11 @@ import (
 	"github.com/go-openapi/runtime"
 	"github.com/go-openapi/runtime/middleware"
 
+	"github.com/slawekzachcial/tournament/internal/gen/models"
 	"github.com/slawekzachcial/tournament/internal/gen/restapi/operations"
 )
 
-//go:generate swagger generate server --target ../../gen --name Tournament --spec ../../../swagger/swagger.yml --principal interface{} --exclude-main
+//go:generate swagger generate server --target ../../gen --name Tournament --spec ../../../api/swagger.yml --principal models.Principal --exclude-main
 
 func configureFlags(api *operations.TournamentAPI) {
 	// api.CommandLineOptionsGroups = []swag.CommandLineOptionsGroup{ ... }
@@ -37,6 +38,19 @@ func configureAPI(api *operations.TournamentAPI) http.Handler {
 
 	api.JSONProducer = runtime.JSONProducer()
 
+	// Applies when the "x-token" header is set
+	if api.KeyAuth == nil {
+		api.KeyAuth = func(token string) (*models.Principal, error) {
+			return nil, errors.NotImplemented("api key auth (key) x-token from header param [x-token] has not yet been implemented")
+		}
+	}
+
+	// Set your custom authorizer if needed. Default one is security.Authorized()
+	// Expected interface runtime.Authorizer
+	//
+	// Example:
+	// api.APIAuthorizer = security.Authorized()
+
 	if api.GetAllStatsHandler == nil {
 		api.GetAllStatsHandler = operations.GetAllStatsHandlerFunc(func(params operations.GetAllStatsParams) middleware.Responder {
 			return middleware.NotImplemented("operation operations.GetAllStats has not yet been implemented")
@@ -48,7 +62,7 @@ func configureAPI(api *operations.TournamentAPI) http.Handler {
 		})
 	}
 	if api.PlayHandler == nil {
-		api.PlayHandler = operations.PlayHandlerFunc(func(params operations.PlayParams) middleware.Responder {
+		api.PlayHandler = operations.PlayHandlerFunc(func(params operations.PlayParams, principal *models.Principal) middleware.Responder {
 			return middleware.NotImplemented("operation operations.Play has not yet been implemented")
 		})
 	}

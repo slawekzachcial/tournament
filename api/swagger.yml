@@ -8,9 +8,16 @@ produces:
   - application/slawekzachcial.tournament.v1+json
 schemes:
   - http
+securityDefinitions:
+  key:
+    type: apiKey
+    in: header
+    name: x-token
 paths:
   /games:
     post:
+      security:
+        - key: []
       operationId: play
       parameters:
         - name: body
@@ -107,3 +114,5 @@ definitions:
         format: int64
       message:
         type: string
+  principal:
+    type: string

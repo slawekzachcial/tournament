@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/go-openapi/errors"
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jackc/pgx/v4/pgxpool"
@@ -52,6 +53,14 @@ func main() {
 	api.GetAllStatsHandler = getAllStatsHandler(theTournament)
 	api.GetTeamStatsHandler = getTeamStatsHandler(theTournament)
 
+	api.KeyAuth = func(token string) (*models.Principal, error) {
+		if token == "qwerty" {
+			p := models.Principal(token)
+			return &p, nil
+		}
+		return nil, errors.New(401, "Incorrect API key auth")
+	}
+
 	if err := server.Serve(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error starting server: %v", err)
 		os.Exit(1)
@@ -59,7 +68,7 @@ func main() {
 }
 
 func playHandler(theTournament *tournament.Tournament) operations.PlayHandlerFunc {
-	return func(params operations.PlayParams) middleware.Responder {
+	return func(params operations.PlayParams, principal *models.Principal) middleware.Responder {
 		game := tournament.Game{*params.Body.TeamA, int(*params.Body.ScoreA), *params.Body.TeamB, int(*params.Body.ScoreB)}
 		err := theTournament.Play(game)
 		if err != nil {
