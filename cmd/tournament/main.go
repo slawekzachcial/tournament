@@ -4,6 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/go-openapi/errors"
@@ -22,14 +23,12 @@ var portFlag = flag.Int("port", 3000, "Port to run this service on")
 func main() {
 	dbUrl := os.Getenv("DB_URL")
 	if dbUrl == "" {
-		fmt.Fprintf(os.Stderr, "DB_URL environment variable not set")
-		os.Exit(1)
+		log.Fatalln("DB_URL environment variable not set")
 	}
 
 	swaggerSpec, err := loads.Analyzed(restapi.SwaggerJSON, "")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error loading swagger spec: %v", err)
-		os.Exit(1)
+		log.Fatalf("Error loading swagger spec: %v", err)
 	}
 
 	api := operations.NewTournamentAPI(swaggerSpec)
@@ -41,8 +40,7 @@ func main() {
 
 	dbPool, err := pgxpool.Connect(context.Background(), dbUrl)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error connecting to database: %v", err)
-		os.Exit(1)
+		log.Fatalf("Error connecting to database: %v", err)
 	}
 	defer dbPool.Close()
 
@@ -62,8 +60,7 @@ func main() {
 	}
 
 	if err := server.Serve(); err != nil {
-		fmt.Fprintf(os.Stderr, "Error starting server: %v", err)
-		os.Exit(1)
+		log.Fatalf("Error starting server: %v", err)
 	}
 }
 
