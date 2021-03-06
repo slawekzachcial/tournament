@@ -51,13 +51,7 @@ func main() {
 	api.GetAllStatsHandler = getAllStatsHandler(theTournament)
 	api.GetTeamStatsHandler = getTeamStatsHandler(theTournament)
 
-	api.KeyAuth = func(token string) (*models.Principal, error) {
-		if token == "qwerty" {
-			p := models.Principal(token)
-			return &p, nil
-		}
-		return nil, errors.New(401, "Incorrect API key auth")
-	}
+	api.KeyAuth = keyAuth
 
 	if err := server.Serve(); err != nil {
 		log.Fatalf("Error starting server: %v", err)
@@ -125,4 +119,12 @@ func getTeamStatsHandler(theTournament *tournament.Tournament) operations.GetTea
 		}
 		return operations.NewGetTeamStatsOK().WithPayload(&ms)
 	}
+}
+
+func keyAuth(token string) (*models.Principal, error) {
+	if token == "qwerty" {
+		p := models.Principal(token)
+		return &p, nil
+	}
+	return nil, errors.New(401, "Incorrect API key auth")
 }
