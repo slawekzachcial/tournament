@@ -3,6 +3,7 @@ package db
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"reflect"
 	"testing"
@@ -14,9 +15,8 @@ import (
 
 const DB_NAME = "tournament_test"
 
-// TEST_DATABASE_URL="postgres://postgres:secret@localhost:5432"
 var dbServerUrl = getEnv("TEST_DATABASE_URL", "postgres://postgres:secret@localhost:5432")
-var testDbUrl = fmt.Sprintf("%s/%s", dbServerUrl, DB_NAME)
+var testDbUrl = fmt.Sprintf("%s/%s?sslmode=disable", dbServerUrl, DB_NAME)
 
 var dbPool *pgxpool.Pool
 
@@ -78,12 +78,12 @@ func TestMain(m *testing.M) {
 
 	err := createTestDatabase()
 	if err != nil {
-		panic(fmt.Sprintf("Unable to create the database: %v", err))
+		log.Panicf("Unable to create the database: %v", err)
 	}
 
 	dbPool, err = pgxpool.Connect(context.Background(), testDbUrl)
 	if err != nil {
-		panic(fmt.Sprintf("Unable to connect to the database: %v", err))
+		log.Panicf("Unable to connect to the database: %v", err)
 	}
 	defer dbPool.Close()
 
@@ -110,15 +110,10 @@ func createTestDatabase() error {
 		return err
 	}
 
-	conn2, err := pgx.Connect(context.Background(), testDbUrl)
-	if err != nil {
-		return fmt.Errorf("Unable to connect to %v: %v", DB_NAME, err)
-	}
-
-	_, err = conn2.Exec(context.Background(), "CREATE TABLE games (team_a varchar(40) NOT NULL, score_a int NOT NULL, team_b varchar(40) NOT NULL, score_b int NOT NULL);")
-	if err != nil {
+	if err := RunMigrations("file://../../sql", testDbUrl); err != nil {
 		return err
 	}
+
 	return nil
 }
 
@@ -140,7 +135,7 @@ func dropTestDatabase() {
 func deleteAllGames() {
 	_, err := dbPool.Exec(context.Background(), "TRUNCATE games;")
 	if err != nil {
-		panic(fmt.Sprintf("Unable to delete all games: %v", err))
+		log.Panicf("Unable to delete all games: %v", err)
 	}
 }
 

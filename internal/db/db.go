@@ -3,10 +3,25 @@ package db
 import (
 	"context"
 
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
 	tournament "github.com/slawekzachcial/tournament/internal"
 )
+
+func RunMigrations(folder, dbUrl string) error {
+	m, err := migrate.New(folder, dbUrl)
+	if err != nil {
+		return err
+	}
+	if err := m.Up(); err != migrate.ErrNoChange {
+		return err
+	}
+
+	return nil
+}
 
 type GamesData struct {
 	pool *pgxpool.Pool

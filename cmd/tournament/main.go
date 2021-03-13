@@ -38,9 +38,13 @@ func main() {
 	flag.Parse()
 	server.Port = *portFlag
 
+	if err := db.RunMigrations("file://sql", dbUrl); err != nil {
+		log.Fatalf("Error running database migrations: %v", err)
+	}
+
 	dbPool, err := pgxpool.Connect(context.Background(), dbUrl)
 	if err != nil {
-		log.Fatalf("Error connecting to database: %v", err)
+		log.Fatalf("Error creating connection pool: %v", err)
 	}
 	defer dbPool.Close()
 
