@@ -51,12 +51,12 @@ curl -X POST http://localhost:3000/games -H 'Content-Type: application/slawekzac
 To get team statistics:
 
 ```shell
-curl -s http://localhost:3000/stats/A -H 'Content-Type: application/slawekzachcial.trounament.v1+json
+curl -s http://localhost:3000/stats/A -H 'Content-Type: application/slawekzachcial.tournament.v1+json
 ```
 
 To get all statistics:
 
 ```shell
-curl -s http://localhost:3000/stats -H 'Content-Type: application/slawekzachcial.trounament.v1+json'
+curl -s http://localhost:3000/stats -H 'Content-Type: application/slawekzachcial.tournament.v1+json'
 ```
 
