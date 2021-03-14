@@ -39,24 +39,35 @@ To start the microservice (API and database):
 docker compose up -f deploy/docker-compose.yml
 ```
 
-It is also possible to start API and database separately: `tools/run-postgres.sh`
-and `DB_URL=postgres://postgres:secret@localhost:5432/tournament?sslmode=disable go run ./cmd/tournament/main.go --port 3000`
+It is also possible to start API and database separately:
+```shell
+tools/run-postgres.sh`
+```
+```shell
+DB_URL=postgres://postgres:secret@localhost:5432/tournament?sslmode=disable \
+  go run ./cmd/tournament/main.go --port 3000
+```
 
 To record a game score:
 
 ```shell
-curl -X POST http://localhost:3000/games -H 'Content-Type: application/slawekzachcial.tournament.v1+json' -d '{"TeamA": "C", "ScoreA": 1, "TeamB": "A", "ScoreB": 0}' -H 'x-token: qwerty'
+curl -X POST http://localhost:3000/games \
+  -H 'Content-Type: application/slawekzachcial.tournament.v1+json' \
+  -H 'x-token: qwerty' \
+  -d '{"TeamA": "C", "ScoreA": 1, "TeamB": "A", "ScoreB": 0}'
 ```
 
 To get team statistics:
 
 ```shell
-curl -s http://localhost:3000/stats/A -H 'Content-Type: application/slawekzachcial.tournament.v1+json
+curl -s http://localhost:3000/stats/A \
+  -H 'Content-Type: application/slawekzachcial.tournament.v1+json
 ```
 
 To get all statistics:
 
 ```shell
-curl -s http://localhost:3000/stats -H 'Content-Type: application/slawekzachcial.tournament.v1+json'
+curl -s http://localhost:3000/stats \
+  -H 'Content-Type: application/slawekzachcial.tournament.v1+json'
 ```
 
