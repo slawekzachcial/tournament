@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:alpine
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: tournament
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+
+  api:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    environment:
+      DB_URL: postgres://postgres:secret@postgres:5432/tournament?sslmode=disable
+    command: ["/wait-for-postgres.sh", "/tournament", "--port", "3000"]
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+
+volumes:
+  db-data:
