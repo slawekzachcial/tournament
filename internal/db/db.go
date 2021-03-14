@@ -8,7 +8,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	tournament "github.com/slawekzachcial/tournament/internal"
+	"github.com/slawekzachcial/tournament/internal/tournament"
 )
 
 func RunMigrations(folder, dbUrl string) error {

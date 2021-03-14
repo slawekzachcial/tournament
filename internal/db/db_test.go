@@ -10,7 +10,7 @@ import (
 
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	tournament "github.com/slawekzachcial/tournament/internal"
+	"github.com/slawekzachcial/tournament/internal/tournament"
 )
 
 const DB_NAME = "tournament_test"

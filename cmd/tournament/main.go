@@ -11,11 +11,11 @@ import (
 	"github.com/go-openapi/loads"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/jackc/pgx/v4/pgxpool"
-	tournament "github.com/slawekzachcial/tournament/internal"
 	"github.com/slawekzachcial/tournament/internal/db"
 	"github.com/slawekzachcial/tournament/internal/gen/models"
 	"github.com/slawekzachcial/tournament/internal/gen/restapi"
 	"github.com/slawekzachcial/tournament/internal/gen/restapi/operations"
+	"github.com/slawekzachcial/tournament/internal/tournament"
 )
 
 var portFlag = flag.Int("port", 3000, "Port to run this service on")
