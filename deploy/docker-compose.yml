@@ -14,7 +14,6 @@ services:
       dockerfile: deploy/Dockerfile
     environment:
       DB_URL: postgres://postgres:secret@postgres:5432/tournament?sslmode=disable
-    command: ["/wait-for-postgres.sh", "/tournament", "--port", "3000"]
     ports:
       - "3000:3000"
     depends_on:

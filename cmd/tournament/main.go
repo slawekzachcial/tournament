@@ -26,6 +26,10 @@ func main() {
 		log.Fatalln("DB_URL environment variable not set")
 	}
 
+	if err := db.WaitForDb(dbUrl, 10, 5); err != nil {
+		log.Fatalf("Unable to connect to the database: %v", err)
+	}
+
 	swaggerSpec, err := loads.Analyzed(restapi.SwaggerJSON, "")
 	if err != nil {
 		log.Fatalf("Error loading swagger spec: %v", err)

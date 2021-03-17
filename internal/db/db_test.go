@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"reflect"
+	"strings"
 	"testing"
 
 	"github.com/jackc/pgx/v4"
@@ -19,6 +20,16 @@ var dbServerUrl = getEnv("TEST_DATABASE_URL", "postgres://postgres:secret@localh
 var testDbUrl = fmt.Sprintf("%s/%s?sslmode=disable", dbServerUrl, DB_NAME)
 
 var dbPool *pgxpool.Pool
+
+func TestWaitForDb(t *testing.T) {
+	if err := WaitForDb(testDbUrl, 2, 2); err != nil {
+		t.Errorf("No error expected when waiting for running DB")
+	}
+
+	if err := WaitForDb(strings.Replace(testDbUrl, "5432", "2345", -1), 2, 2); err == nil {
+		t.Errorf("Error expected when waiting for non-running DB")
+	}
+}
 
 func TestFindByTeam(t *testing.T) {
 	defer deleteAllGames()

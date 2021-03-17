@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"time"
 
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
@@ -10,6 +11,22 @@ import (
 	"github.com/jackc/pgx/v4/pgxpool"
 	"github.com/slawekzachcial/tournament/internal/tournament"
 )
+
+func WaitForDb(dbUrl string, tries, waitSecs int) error {
+	var result error
+
+	for i := tries; i > 0; i-- {
+		conn, err := pgx.Connect(context.Background(), dbUrl)
+		if err == nil {
+			defer conn.Close(context.Background())
+			return nil
+		}
+		result = err
+		time.Sleep(time.Duration(waitSecs) * time.Second)
+	}
+
+	return result
+}
 
 func RunMigrations(folder, dbUrl string) error {
 	m, err := migrate.New(folder, dbUrl)
