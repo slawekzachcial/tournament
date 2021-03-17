@@ -29,6 +29,8 @@ The following implementation principles were used:
   package with migrations present in `sql` folder
 * Microservice has been packaged as Docker Compose stack with definitions in
   `deploy` folder
+* The Docker image is built based on `scratch` and so the application must be
+  compiled completely statically
 * Project layout follows https://github.com/golang-standards/project-layout
 
 ## Running the Microservice
